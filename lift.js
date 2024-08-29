@@ -68,19 +68,21 @@ function render() {
     buttonDiv.setAttribute("id", "btndiv");
     createFloors.append(buttonDiv);
 
-    let createUpButton = document.createElement("button");
-    let createDownButton = document.createElement("button");
+    if (i !== totalFloor) { // Don't add the "Up" button on the top floor
+      let createUpButton = document.createElement("button");
+      createUpButton.innerHTML = "Up";
+      createUpButton.setAttribute("class", "UpBtn");
+      createUpButton.setAttribute("id", `upbtn-${i}`);
+      buttonDiv.append(createUpButton);
+    }
 
-    createUpButton.innerHTML = "Up";
-    createDownButton.innerHTML = "Down";
-    createUpButton.setAttribute("class", "UpBtn");
-    createDownButton.setAttribute("class", "DownBtn");
-
-    createUpButton.setAttribute("id", `upbtn-${i}`);
-    createDownButton.setAttribute("id", `downbtn-${i}`);
-
-    buttonDiv.append(createUpButton);
-    buttonDiv.append(createDownButton);
+    if (i !== 0) { // Don't add the "Down" button on the ground floor
+      let createDownButton = document.createElement("button");
+      createDownButton.innerHTML = "Down";
+      createDownButton.setAttribute("class", "DownBtn");
+      createDownButton.setAttribute("id", `downbtn-${i}`);
+      buttonDiv.append(createDownButton);
+    }
   }
 
   const btns = document.querySelectorAll(".UpBtn");
