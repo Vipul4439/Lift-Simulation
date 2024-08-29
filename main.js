@@ -6,7 +6,7 @@ function openLiftPage(){
     ).value;
 
     if(totalFloor < 1 || totalLift < 1){
-        alert("You should have mimimum 2 floor and 1 lift")
+        alert("You should have mimimum 1 floor and 1 lift")
         return
     }
 
