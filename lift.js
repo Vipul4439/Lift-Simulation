@@ -8,7 +8,8 @@ const lifts = Array.from({ length: totalLift }, (_, index) => ({
   id: `lift-${index}`,
   currentFloor: 0,       
   direction: null,       
-  isMoving: false        
+  isMoving: false,
+  busy: false        
 }));
 
 function render() {
@@ -124,18 +125,20 @@ function getNearestAvailableLift(targetFloor, direction) {
   lifts.forEach(lift => {
     const distance = Math.abs(lift.currentFloor - targetFloor);
     
-    if ((!lift.isMoving && lift.currentFloor !== targetFloor) ||
+    if ((!lift.isMoving && !lift.busy && lift.currentFloor !== targetFloor) ||
         (lift.direction === direction && isLiftGoingToStopBeforeTarget(lift, targetFloor))) {
-
-        if (distance < minimumDistance) {
-            minimumDistance = distance;
-            nearestLift = lift;
-        }
+      if (distance < minimumDistance) {
+        minimumDistance = distance;
+        nearestLift = lift;
+      }
     }
-});
+  });
 
-return nearestLift;
-}
+  return nearestLift;
+};
+
+
+
 
 function handleButtonPress(targetFloor, direction) {
   const nearestLift = getNearestAvailableLift(targetFloor, direction);
@@ -148,6 +151,7 @@ function handleButtonPress(targetFloor, direction) {
 
 function moveLiftToFloor(lift, targetFloor) {
   lift.isMoving = true;
+  lift.busy = true;
   lift.direction = targetFloor > lift.currentFloor ? 'up' : 'down';
 
   const liftElement = document.getElementById(lift.id);
@@ -183,8 +187,8 @@ function moveLiftToFloor(lift, targetFloor) {
       
       leftDoorInner.style.transform = 'translateX(0)'; 
       rightDoorInner.style.transform = 'translateX(0)';
-
-      console.log(`${lift.id} has arrived at floor ${targetFloor} and doors are closed`);
+      lift.busy = false;
+     
     }, 2500); 
 
   }, moveDuration); 
