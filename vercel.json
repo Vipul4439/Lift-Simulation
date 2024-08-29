@@ -1,14 +1,35 @@
 {
-    "builds": [
-      {
-        "src": "public/index.html",
-        "use": "@vercel/static"
-      }
-    ],
-    "routes": [
-      { "src": "/", "dest": "public/index.html" },
-      { "src": "/css/(.*)", "dest": "public/css/$1" },
-      { "src": "/js/(.*)", "dest": "public/js/$1" },
-      { "src": "/lift.html", "dest": "public/lift.html" }
-    ]
-  }
+  "version": 3,
+  "builds": [
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.js",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/$",
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/main.css$",
+      "dest": "/main.css"
+    },
+    {
+      "src": "^/main.js$",
+      "dest": "/main.js"
+    },
+    {
+      "src": "^/lift.html$",
+      "dest": "/lift.html"
+    }
+  ]
+}
