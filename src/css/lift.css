@@ -1,0 +1,85 @@
+
+#liftMainDiv {
+    margin: 0 auto; 
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+  }
+.header {
+    margin: 0 auto; 
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.allfloors {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 0 10px;
+    border-bottom: 5px solid #F88C00;
+    background: yellow;
+    height: 90px;
+    width: 100%;
+    margin-top: 10px;
+    box-sizing: border-box;
+    
+}
+
+.allLifts {
+    position: absolute;
+    width: 80px;
+    height: 85px;
+    background: white;
+    transition: bottom 2s ease-in-out; 
+}
+
+.allLifts .door {
+    margin-right: 10px;
+}
+
+.door {
+    position: absolute;
+    top: 0;
+    width: 50%;
+    height: 100%;
+    background: red;
+    transition: transform 2s;
+    overflow: hidden; 
+}
+
+
+
+.door.left {
+    left: 0;
+    border-right: 1px solid #333;
+   
+}
+
+.door.right {
+    right: 0;
+    border-left: 1px solid #333;
+    left: 41px;
+    
+}
+.door-inner {
+    width: 100%;
+    height: 100%;
+    background-color: blue; 
+  }
+
+
+#btndiv {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
