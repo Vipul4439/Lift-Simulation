@@ -1,14 +1,14 @@
 {
     "builds": [
       {
-        "src": "src/index.html",
+        "src": "public/index.html",
         "use": "@vercel/static"
       }
     ],
     "routes": [
-      { "src": "/", "dest": "src/index.html" },
-      { "src": "/css/(.*)", "dest": "src/css/$1" },
-      { "src": "/js/(.*)", "dest": "src/js/$1" },
-      { "src": "/lift.html", "dest": "src/lift.html" }
+      { "src": "/", "dest": "public/index.html" },
+      { "src": "/css/(.*)", "dest": "public/css/$1" },
+      { "src": "/js/(.*)", "dest": "public/js/$1" },
+      { "src": "/lift.html", "dest": "public/lift.html" }
     ]
   }
