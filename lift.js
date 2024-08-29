@@ -9,11 +9,14 @@ const lifts = Array.from({ length: totalLift }, (_, index) => ({
   currentFloor: 0,       
   direction: null,       
   isMoving: false,
-  busy: false        
+  busy: false,
+  doorsClosed: true ,
+  requestQueue: []        
 }));
 
 function render() {
   let mainDiv = document.getElementById("liftMainDiv");
+  
   mainDiv.style.width = 38.9 * totalLift * 3.5 + "px";
 
   for (let i = totalFloor; i >= 0; i--) {
@@ -38,6 +41,7 @@ function render() {
         liftDiv.setAttribute("id", `lift-${j}`);
         liftDiv.setAttribute("class", "allLifts");
         liftDiv.style.position = "absolute";
+
         liftDiv.style.width = "80px";
         liftDiv.style.height = "85px";
         liftDiv.style.left = j * (80 + 20) + "px"; // Adjust position
@@ -104,7 +108,7 @@ function render() {
     down.addEventListener("click", (event) => {
       const clickedId = event.currentTarget.id;
       const currentFloor = clickedId.split("-")[1];
-      handleButtonPress(currentFloor, 'up')
+      handleButtonPress(currentFloor, 'down')
     });
   }
 }
@@ -121,79 +125,107 @@ function isLiftGoingToStopBeforeTarget(lift, targetFloor) {
 }
 
 function getNearestAvailableLift(targetFloor, direction) {
-  let nearestLift = null;
-  let minimumDistance = Infinity;
+
+  if (lifts.length === 1) {
+    return lifts[0];
+  }
+  let preferredLift = null;
+  let secondaryLift = null;
+  let minimumDistancePreferred = Infinity;
+  let minimumDistanceSecondary = Infinity;
 
   lifts.forEach(lift => {
     const distance = Math.abs(lift.currentFloor - targetFloor);
+
+   
+    if (lift.direction === direction && !lift.isMoving && !lift.busy) {
+      if (distance < minimumDistancePreferred) {
+        minimumDistancePreferred = distance;
+        preferredLift = lift;
+      }
+    }
     
-    if ((!lift.isMoving && !lift.busy && lift.currentFloor !== targetFloor) ||
-        (lift.direction === direction && isLiftGoingToStopBeforeTarget(lift, targetFloor))) {
-      if (distance < minimumDistance) {
-        minimumDistance = distance;
-        nearestLift = lift;
+   
+    if (lift.direction !== direction && !lift.isMoving && !lift.busy) {
+      if (distance < minimumDistanceSecondary) {
+        minimumDistanceSecondary = distance;
+        secondaryLift = lift;
       }
     }
   });
 
-  return nearestLift;
+  
+  return preferredLift || secondaryLift;
 };
 
 
 
 
 function handleButtonPress(targetFloor, direction) {
-  const nearestLift = getNearestAvailableLift(targetFloor, direction);
-  if (nearestLift) {
-      moveLiftToFloor(nearestLift, targetFloor);
-  } else {
-      console.log('No available lift found.');
+  const availableLift = getNearestAvailableLift(targetFloor, direction);
+  if (availableLift) {
+    availableLift.requestQueue.push({ targetFloor, direction });
+    processLiftRequests();
   }
 }
 
+function processLiftRequests() {
+  lifts.sort((a, b) => a.requestQueue.length - b.requestQueue.length);
+  lifts.forEach(lift => {
+    if (!lift.isMoving && !lift.busy && lift.requestQueue.length > 0) {
+      const nextRequest = lift.requestQueue.shift();
+      moveLiftToFloor(lift, nextRequest.targetFloor);
+    }
+  });
+}
+
 function moveLiftToFloor(lift, targetFloor) {
+  if (lift.isMoving || lift.busy) return;
   lift.isMoving = true;
   lift.busy = true;
   lift.direction = targetFloor > lift.currentFloor ? 'up' : 'down';
 
   const liftElement = document.getElementById(lift.id);
   const floorHeight = 100; 
-  
-  liftElement.style.transition = `bottom 2s`; 
+
+  const moveDuration = Math.abs(lift.currentFloor - targetFloor) * 2000; // Move duration (2 seconds per floor)
+
+  liftElement.style.transition = `bottom ${moveDuration}ms`;
+
   liftElement.style.bottom = targetFloor * floorHeight + "px";
 
-  const moveDuration = 2000 * Math.abs(lift.currentFloor - targetFloor); // Move duration (2 seconds per floor)
-
-
   setTimeout(() => {
-    
     lift.currentFloor = targetFloor;
     lift.isMoving = false;
     lift.direction = null;
-    
-   
+
     const leftDoorInner = liftElement.querySelector('.door.left .door-inner');
     const rightDoorInner = liftElement.querySelector('.door.right .door-inner');
-    
-    leftDoorInner.style.transition = 'transform 2.5s'; 
-    rightDoorInner.style.transition = 'transform 2.5s'; 
-    
-    leftDoorInner.style.transform = 'translateX(-100%)'; 
-    rightDoorInner.style.transform = 'translateX(100%)'; 
-    
-    
-    
-    setTimeout(() => {
-      leftDoorInner.style.transition = 'transform 2.5s'; 
-      rightDoorInner.style.transition = 'transform 2.5s'; 
-      
-      leftDoorInner.style.transform = 'translateX(0)'; 
-      rightDoorInner.style.transform = 'translateX(0)';
-      lift.busy = false;
-     
-    }, 2500); 
 
-  }, moveDuration); 
+    // Open doors
+    leftDoorInner.style.transition = 'transform 2.5s';
+    rightDoorInner.style.transition = 'transform 2.5s';
+    leftDoorInner.style.transform = 'translateX(-100%)';
+    rightDoorInner.style.transform = 'translateX(100%)';
+
+    lift.doorsClosed = false;
+
+    // Close doors after opening
+    setTimeout(() => {
+      leftDoorInner.style.transform = 'translateX(0)';
+      rightDoorInner.style.transform = 'translateX(0)';
+
+      // Wait for doors to close
+      setTimeout(() => {
+        lift.doorsClosed = true;
+        lift.busy = false;
+
+        // Process next request
+        processLiftRequests();
+      }, 2500); // Time for doors to close
+    }, 2500); // Time for doors to open
+
+  }, moveDuration);
 
  
 }

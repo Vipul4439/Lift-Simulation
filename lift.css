@@ -5,6 +5,7 @@
     flex-direction: column; 
     align-items: center; 
     justify-content: center; 
+    min-width: 250px
   }
 .header {
     margin: 0 auto; 
@@ -35,6 +36,7 @@
     height: 85px;
     background: white;
     transition: bottom 2s ease-in-out; 
+    margin-left: 70px;
 }
 
 .allLifts .door {
