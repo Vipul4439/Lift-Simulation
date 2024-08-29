@@ -8,6 +8,7 @@
     "routes": [
       { "src": "/", "dest": "src/index.html" },
       { "src": "/css/(.*)", "dest": "src/css/$1" },
-      { "src": "/js/(.*)", "dest": "src/js/$1" }
+      { "src": "/js/(.*)", "dest": "src/js/$1" },
+      { "src": "/lift.html", "dest": "src/lift.html" }
     ]
   }
